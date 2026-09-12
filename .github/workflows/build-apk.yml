@@ -48,22 +48,41 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-36'
+
+      - name: Accept Android SDK Licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Restore Debug Keystore
         run: |
-          if [ ! -f "debug.keystore" ] && [ -f "debug.keystore.base64" ]; then
+          if [ -f "debug.keystore.base64" ]; then
             echo "Decoding debug.keystore from base64..."
             base64 -d debug.keystore.base64 > debug.keystore
-          elif [ -f "debug.keystore" ]; then
-            echo "debug.keystore already present."
           fi
+          if [ ! -f "debug.keystore" ]; then
+            echo "Generating fallback debug keystore..."
+            keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          ls -lh debug.keystore
 
       - name: Configure Environment Variables
         run: |
-          if [ ! -f ".env" ] && [ -f ".env.example" ]; then
-            echo "Creating .env from .env.example..."
-            cp .env.example .env
+          if [ ! -f ".env" ]; then
+            if [ -f ".env.example" ]; then
+              echo "Creating .env from .env.example..."
+              cp .env.example .env
+            else
+              echo "Creating empty .env..."
+              touch .env
+            fi
           fi
 
       - name: Grant execute permission for gradlew
@@ -72,17 +91,17 @@ jobs:
       - name: Build Debug APK
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == 'both' }}
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Djava.awt.headless=true"
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=\"-Xmx3072m -XX:MaxMetaspaceSize=512m\" -Djava.awt.headless=true"
+        run: ./gradlew assembleDebug --no-daemon --max-workers=2 --stacktrace
 
       - name: Build Release APK
         if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.build_type == 'release' || github.event.inputs.build_type == 'both') }}
         env:
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Djava.awt.headless=true"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs=\"-Xmx3072m -XX:MaxMetaspaceSize=512m\" -Djava.awt.headless=true"
           KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
+        run: ./gradlew assembleRelease --no-daemon --max-workers=2 --stacktrace
 
       - name: Upload Debug APK Artifact
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug' || github.event.inputs.build_type == 'both' }}
