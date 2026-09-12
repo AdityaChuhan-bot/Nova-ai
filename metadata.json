@@ -1,0 +1,6 @@
+{
+  "name": "Jarvis Mini",
+  "description": "Lightweight Android Voice Assistant and DIY Smart Speaker designed for low-resource hardware.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
