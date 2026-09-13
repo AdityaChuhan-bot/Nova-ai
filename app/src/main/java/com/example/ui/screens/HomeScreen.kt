@@ -363,6 +363,7 @@ fun HomeScreen(
             JarvisOrb(
                 state = assistantState,
                 audioRms = audioRmsLevel,
+                lowResourceMode = settings.lowResourceMode,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
 
@@ -400,17 +401,15 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(100.dp)
             ) {
-                // Glow ring around mic
-                Box(
-                    modifier = Modifier
-                        .size(92.dp)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(JarvisGlow, Color.Transparent)
-                            )
-                        )
-                )
+                // Subtle reactive accent ring around mic when listening
+                if (assistantState == AssistantState.LISTENING) {
+                    Box(
+                        modifier = Modifier
+                            .size(94.dp)
+                            .clip(CircleShape)
+                            .background(JarvisCyan.copy(alpha = 0.2f))
+                    )
+                }
 
                 Surface(
                     onClick = onMicTapped,
@@ -423,7 +422,6 @@ fun HomeScreen(
                     modifier = Modifier
                         .size(84.dp)
                         .testTag("mic_button")
-                        .shadow(8.dp, CircleShape)
                 ) {
                     Box(
                         contentAlignment = Alignment.Center,

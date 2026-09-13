@@ -19,22 +19,22 @@ import com.example.ui.theme.ObsidianBorder
 import com.example.ui.theme.ObsidianCard
 import com.example.ui.theme.TextSecondary
 
+private val QUICK_COMMANDS = listOf(
+    "What time is it?",
+    "What's the weather?",
+    "Open SimpMusic",
+    "Pause music",
+    "Today's date",
+    "Increase volume",
+    "Set volume to 70%",
+    "Why is the sky blue?"
+)
+
 @Composable
 fun QuickCommandChips(
     onCommandSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val commands = listOf(
-        "What time is it?",
-        "What's the weather?",
-        "Open SimpMusic",
-        "Pause music",
-        "Today's date",
-        "Increase volume",
-        "Set volume to 70%",
-        "Why is the sky blue?"
-    )
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -42,7 +42,7 @@ fun QuickCommandChips(
             .padding(horizontal = 16.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        commands.forEach { cmd ->
+        QUICK_COMMANDS.forEach { cmd ->
             OutlinedButton(
                 onClick = { onCommandSelected(cmd) },
                 shape = RoundedCornerShape(20.dp),

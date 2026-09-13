@@ -29,12 +29,24 @@ data class JarvisSettings(
     val weatherUnit: String = "Celsius", // "Celsius" or "Fahrenheit"
     val keepScreenOn: Boolean = true,
     val startOnBoot: Boolean = false,
-    val batteryMode: BatteryMode = BatteryMode.BALANCED
+    val batteryMode: BatteryMode = BatteryMode.BALANCED,
+    val lowResourceMode: Boolean = false
 )
 
-class JarvisPreferences(context: Context) {
+class JarvisPreferences(private val context: Context) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("jarvis_mini_prefs", Context.MODE_PRIVATE)
+
+    private fun isNaturallyLowResourceDevice(): Boolean {
+        return try {
+            val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager
+            (am?.isLowRamDevice == true) || 
+                (Runtime.getRuntime().maxMemory() <= 192 * 1024 * 1024L) || 
+                (android.os.Build.VERSION.SDK_INT <= 25)
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     fun loadSettings(): JarvisSettings {
         val modeStr = prefs.getString(KEY_OPERATION_MODE, OperationMode.PUSH_TO_TALK.name) ?: OperationMode.PUSH_TO_TALK.name
@@ -42,6 +54,8 @@ class JarvisPreferences(context: Context) {
 
         val batteryStr = prefs.getString(KEY_BATTERY_MODE, BatteryMode.BALANCED.name) ?: BatteryMode.BALANCED.name
         val battery = try { BatteryMode.valueOf(batteryStr) } catch (e: Exception) { BatteryMode.BALANCED }
+
+        val defaultLowResource = isNaturallyLowResourceDevice()
 
         return JarvisSettings(
             wakeWord = prefs.getString(KEY_WAKE_WORD, "Hey Jarvis") ?: "Hey Jarvis",
@@ -57,7 +71,8 @@ class JarvisPreferences(context: Context) {
             weatherUnit = prefs.getString(KEY_WEATHER_UNIT, "Celsius") ?: "Celsius",
             keepScreenOn = prefs.getBoolean(KEY_KEEP_SCREEN_ON, true),
             startOnBoot = prefs.getBoolean(KEY_START_ON_BOOT, false),
-            batteryMode = battery
+            batteryMode = battery,
+            lowResourceMode = prefs.getBoolean(KEY_LOW_RESOURCE_MODE, defaultLowResource)
         )
     }
 
@@ -77,6 +92,7 @@ class JarvisPreferences(context: Context) {
             .putBoolean(KEY_KEEP_SCREEN_ON, settings.keepScreenOn)
             .putBoolean(KEY_START_ON_BOOT, settings.startOnBoot)
             .putString(KEY_BATTERY_MODE, settings.batteryMode.name)
+            .putBoolean(KEY_LOW_RESOURCE_MODE, settings.lowResourceMode)
             .apply()
     }
 
@@ -95,5 +111,6 @@ class JarvisPreferences(context: Context) {
         private const val KEY_KEEP_SCREEN_ON = "keep_screen_on"
         private const val KEY_START_ON_BOOT = "start_on_boot"
         private const val KEY_BATTERY_MODE = "battery_mode"
+        private const val KEY_LOW_RESOURCE_MODE = "low_resource_mode"
     }
 }

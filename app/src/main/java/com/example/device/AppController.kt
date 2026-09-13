@@ -101,18 +101,29 @@ class AppController(private val context: Context) {
         }
     }
 
-    fun getInstalledApps(): List<AppInfo> {
-        val intent = Intent(Intent.ACTION_MAIN, null).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
+    private var cachedApps: List<AppInfo>? = null
+
+    fun getInstalledApps(forceRefresh: Boolean = false): List<AppInfo> {
+        if (!forceRefresh && cachedApps != null) {
+            return cachedApps!!
         }
-        val resolveInfos = packageManager.queryIntentActivities(intent, 0)
-        return resolveInfos.mapNotNull { resolveInfo ->
-            val pkg = resolveInfo.activityInfo.packageName
-            val label = resolveInfo.loadLabel(packageManager).toString()
-            if (pkg != context.packageName) {
-                AppInfo(label = label, packageName = pkg)
-            } else null
-        }.sortedBy { it.label }
+        return try {
+            val intent = Intent(Intent.ACTION_MAIN, null).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
+            }
+            val resolveInfos = packageManager.queryIntentActivities(intent, 0)
+            val apps = resolveInfos.mapNotNull { resolveInfo ->
+                val pkg = resolveInfo.activityInfo.packageName
+                val label = resolveInfo.loadLabel(packageManager).toString()
+                if (pkg != context.packageName) {
+                    AppInfo(label = label, packageName = pkg)
+                } else null
+            }.sortedBy { it.label }
+            cachedApps = apps
+            apps
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }
 

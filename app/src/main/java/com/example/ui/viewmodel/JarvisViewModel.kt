@@ -105,10 +105,19 @@ class JarvisViewModel(application: Application) : AndroidViewModel(application) 
         refreshInstalledApps()
         startClockUpdates()
         refreshVolume()
-        _isOnline.value = networkMonitor.isOnline()
+        observeNetwork()
 
         if (_settings.value.operationMode == OperationMode.ALWAYS_LISTENING) {
             JarvisForegroundService.start(context)
+        }
+    }
+
+    private fun observeNetwork() {
+        _isOnline.value = networkMonitor.isOnline()
+        viewModelScope.launch {
+            networkMonitor.isOnlineFlow.collect { online ->
+                _isOnline.value = online
+            }
         }
     }
 
@@ -129,8 +138,10 @@ class JarvisViewModel(application: Application) : AndroidViewModel(application) 
                 val now = Date()
                 _currentTimeString.value = timeFormat.format(now)
                 _currentDateString.value = dateFormat.format(now)
-                _isOnline.value = networkMonitor.isOnline()
-                delay(1000)
+                
+                // Sleep until next minute arrives to avoid waking CPU every second
+                val millisUntilNextMinute = 60_000L - (System.currentTimeMillis() % 60_000L) + 100L
+                delay(millisUntilNextMinute.coerceAtLeast(1000L))
             }
         }
     }
@@ -140,7 +151,7 @@ class JarvisViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun refreshInstalledApps() {
-        viewModelScope.launch {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             _installedApps.value = appController.getInstalledApps()
         }
     }
@@ -188,10 +199,18 @@ class JarvisViewModel(application: Application) : AndroidViewModel(application) 
 
             override fun onBeginningOfSpeech() {}
 
+            private var lastRmsUpdateTime = 0L
+
             override fun onRmsChanged(rmsdB: Float) {
+                val now = System.currentTimeMillis()
+                // Throttle to max ~15 updates/sec to prevent UI thread thrashing
+                if (now - lastRmsUpdateTime < 65L) return
                 // Normalize rmsdB (-2 to 10 typical range) into 0.0 .. 1.0 for UI visualizer
                 val normalized = ((rmsdB + 2f) / 12f).coerceIn(0.05f, 1.0f)
-                _audioRmsLevel.value = normalized
+                if (kotlin.math.abs(normalized - _audioRmsLevel.value) > 0.06f) {
+                    lastRmsUpdateTime = now
+                    _audioRmsLevel.value = normalized
+                }
             }
 
             override fun onPartialResults(partialText: String) {

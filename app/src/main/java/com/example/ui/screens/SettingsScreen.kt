@@ -97,6 +97,7 @@ fun SettingsScreen(
     var keepScreenOn by remember { mutableStateOf(currentSettings.keepScreenOn) }
     var startOnBoot by remember { mutableStateOf(currentSettings.startOnBoot) }
     var batteryMode by remember { mutableStateOf(currentSettings.batteryMode) }
+    var lowResourceMode by remember { mutableStateOf(currentSettings.lowResourceMode) }
 
     fun commitChanges() {
         onSaveSettings(
@@ -114,7 +115,8 @@ fun SettingsScreen(
                 weatherUnit = unit,
                 keepScreenOn = keepScreenOn,
                 startOnBoot = startOnBoot,
-                batteryMode = batteryMode
+                batteryMode = batteryMode,
+                lowResourceMode = lowResourceMode
             )
         )
     }
@@ -586,6 +588,31 @@ fun SettingsScreen(
                                 checked = startOnBoot,
                                 onCheckedChange = {
                                     startOnBoot = it
+                                    commitChanges()
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = JarvisCyan,
+                                    checkedTrackColor = JarvisCyan.copy(alpha = 0.3f)
+                                )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Low-Resource / Legacy Device Optimization toggle
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Low-Resource Mode (Moto G4 & Legacy)", color = TextPrimary, style = MaterialTheme.typography.bodyMedium)
+                                Text("Disables continuous idle GPU animations, reduces RMS sampling, and caches system apps for smooth operation on older hardware.", color = TextMuted, style = MaterialTheme.typography.bodySmall)
+                            }
+                            Switch(
+                                checked = lowResourceMode,
+                                onCheckedChange = {
+                                    lowResourceMode = it
                                     commitChanges()
                                 },
                                 colors = SwitchDefaults.colors(
