@@ -31,6 +31,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build APK
@@ -111,6 +114,35 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish Finished Product (GitHub Release)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Jarvis Mini - Latest Finished App (APK)"
+          body: |
+            ## 📱 Jarvis Mini - Finished Application
+
+            Anyone can download and install the finished application APK directly from the assets below!
+
+            ### 📥 Download Finished Product
+            - **Download APK**: Direct download [`app-debug.apk`](https://github.com/AdityaChuhan-bot/Nova-ai/releases/download/latest/app-debug.apk)
+
+            ### 🚀 Quick Installation Guide
+            1. Download `app-debug.apk` directly to your Android phone or tablet.
+            2. Open the downloaded file from your notifications or File Manager.
+            3. If prompted, allow **"Install unknown apps"** in Android Settings.
+            4. Launch **Jarvis Mini** and grant Microphone & Notification permissions.
+            5. Ready to use!
+
+            ---
+            *Built automatically by GitHub Actions CI from commit `${{ github.sha }}`.*
+          files: app/build/outputs/apk/debug/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Release APK Artifact
         if: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.build_type == 'release' || github.event.inputs.build_type == 'both') }}

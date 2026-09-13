@@ -37,11 +37,20 @@ Please be respectful, constructive, and collaborative in all discussions and pul
 
 ### Branching Strategy
 - `main` is the stable release branch.
+- **Direct Pushes Restricted**: Pushing directly to `main` is blocked. All changes require an approved Pull Request.
 - Create feature branches with descriptive prefixes:
   - `feat/voice-command-expansion`
   - `fix/keystore-restore-script`
   - `docs/update-smart-speaker-guide`
   - `refactor/audio-visualizer-canvas`
+
+---
+
+## 🔒 Pull Request Review & Code Ownership
+
+- Every Pull Request automatically requests review from the repository owner (`@AdityaChuhan-bot`) as defined in [`.github/CODEOWNERS`](.github/CODEOWNERS).
+- Automated CI builds (`build-apk.yml`) verify compilation before any code can be merged.
+- Only `@AdityaChuhan-bot` can merge changes into `main`. For details on the security model, refer to [`.github/BRANCH_PROTECTION.md`](.github/BRANCH_PROTECTION.md).
 
 ### Commit Message Conventions
 We follow [Conventional Commits](https://www.conventionalcommits.org/):

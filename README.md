@@ -12,8 +12,28 @@
 
 ---
 
+## 📥 Download Finished Product (APK)
+
+Anyone can immediately download and install the pre-compiled finished application on their Android device:
+
+[![Download Latest APK](https://img.shields.io/badge/Download-Finished%20APK-00C853?style=for-the-badge&logo=android&logoColor=white)](https://github.com/AdityaChuhan-bot/Nova-ai/releases/latest)
+[![Direct APK Download](https://img.shields.io/badge/Direct-Download%20.apk-00B0FF?style=for-the-badge&logo=googleplay&logoColor=white)](https://github.com/AdityaChuhan-bot/Nova-ai/releases/download/latest/app-debug.apk)
+[![CI Artifacts](https://img.shields.io/badge/Actions-Build%20Artifacts-795548?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/AdityaChuhan-bot/Nova-ai/actions)
+
+- 📦 **Latest Release Assets**: [GitHub Releases / Latest](https://github.com/AdityaChuhan-bot/Nova-ai/releases/latest)
+- 📲 **Direct Download Link**: [`app-debug.apk`](https://github.com/AdityaChuhan-bot/Nova-ai/releases/download/latest/app-debug.apk)
+- ⚙️ **Continuous Integration Artifacts**: [GitHub Actions Builds](https://github.com/AdityaChuhan-bot/Nova-ai/actions)
+
+### 🚀 3-Step Fast Installation
+1. Tap the **[Download Finished APK](https://github.com/AdityaChuhan-bot/Nova-ai/releases/download/latest/app-debug.apk)** button directly from your Android phone or tablet.
+2. Tap the downloaded `.apk` file in your browser downloads or File Manager. If prompted, allow **"Install unknown apps"** in Android Settings.
+3. Open **Jarvis Mini**, grant Microphone and Notification permissions when prompted, and you're all set!
+
+---
+
 ## 📑 Table of Contents
 
+- [Download Finished Product](#-download-finished-product-apk)
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [Screenshots & UI Showcase](#-screenshots--ui-showcase)
@@ -23,8 +43,8 @@
   - [Prerequisites](#prerequisites)
   - [Configuration (.env)](#configuration-env)
   - [Building from Source](#building-from-source)
-  - [Downloading Pre-Built APKs](#downloading-pre-built-apks)
 - [DIY Smart Speaker Deployment](#-diy-smart-speaker-deployment)
+- [Repository Access & Protection](#-repository-access--protection)
 - [CI/CD & Automation](#-cicd--automation)
 - [Contributing](#-contributing)
 - [Security](#-security)
@@ -160,6 +180,17 @@ Repurposing an old phone or tablet into an ambient smart display:
 2. **Power**: Keep the device plugged into a standard 5V/2A or USB-C power supply.
 3. **Screen Settings**: Enable **"Keep Screen On"** in Jarvis Mini's Settings screen.
 4. **Dedicated Launcher (Optional)**: Set Jarvis Mini as the default assistive application in Android Settings (`Apps > Default apps > Digital assistant app`).
+
+---
+
+## 🛡️ Repository Access & Protection
+
+This repository is configured so that **anyone can download and run the finished application**, while protecting the codebase against unauthorized or accidental direct changes:
+
+- **Public Download Access**: Pre-compiled APKs are publicly available to everyone via [Releases](https://github.com/AdityaChuhan-bot/Nova-ai/releases/latest) and [Actions Artifacts](https://github.com/AdityaChuhan-bot/Nova-ai/actions).
+- **Direct Pushes Blocked**: Direct `git push` to `main` is restricted. Visitors and collaborators cannot push changes directly into the repository.
+- **Code Ownership Enforced**: Defined in [`.github/CODEOWNERS`](.github/CODEOWNERS) so that any proposed Pull Request requires mandatory review and explicit approval by `@AdityaChuhan-bot`.
+- **Branch Protection Guide**: See [`.github/BRANCH_PROTECTION.md`](.github/BRANCH_PROTECTION.md) for full branch ruleset configuration.
 
 ---
 

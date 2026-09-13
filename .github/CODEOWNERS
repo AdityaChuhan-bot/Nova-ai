@@ -1,0 +1,7 @@
+# GitHub CODEOWNERS
+# This file defines individuals or teams that are responsible for code in this repository.
+# These owners are automatically requested for review when a pull request is opened,
+# and branch protection rules ensure unauthorized users cannot commit directly to the repository.
+
+# The repository owner has strict ownership and approval requirements over all files:
+* @AdityaChuhan-bot
